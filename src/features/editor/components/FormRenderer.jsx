@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { editorSlice } from '../editorSlice';
-import { ACTION_MANIFEST } from '../../../constants/actionManifest';
+import { ACTION_MANIFEST } from '@/constants/actionManifest';
 
 export const FormRenderer = ({ action, onOpenPicker }) => {
   const dispatch = useDispatch();

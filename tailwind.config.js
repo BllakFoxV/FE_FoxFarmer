@@ -2,6 +2,21 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}", // Kiểm tra kỹ đường dẫn này!
+  ],
+  theme: {
+    extend: {
+      colors: {
+        dark: {
+          bg: '#050505',
+          card: '#0d0d0d',
+          border: '#1a1a1a'
+        }
+      }
+    },
+  },
   plugins: [react()],
   server: {
     port: 5173,

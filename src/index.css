@@ -4,25 +4,23 @@
 
 @layer base {
   body {
-    @apply bg-[#050505] text-gray-200 overflow-hidden;
+    @apply bg-[#050505] text-gray-300 selection:bg-blue-500/30;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Custom Scrollbar cho mảng kịch bản dài */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+/* Custom Scrollbar cho mảng kịch bản */
+::-webkit-scrollbar {
+  width: 5px;
 }
-
-.custom-scrollbar::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   @apply bg-transparent;
 }
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-gray-800 rounded-full hover:bg-gray-700 transition-colors;
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-800 rounded-full hover:bg-blue-600 transition-colors;
 }
 
-/* Hiệu ứng mờ khi đang Link Action */
-.linking-overlay {
-  @apply fixed inset-0 bg-blue-900/10 backdrop-blur-[2px] z-40 pointer-events-none;
+/* Hiệu ứng Glow cho các nút bấm */
+.glow-blue {
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
 }

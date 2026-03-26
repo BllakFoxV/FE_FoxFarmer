@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { ACTION_MANIFEST } from '../../../constants/actionManifest';
+import { ACTION_MANIFEST } from '@/constants/actionManifest';
 import { editorSlice } from '../editorSlice';
 import { Search, X } from 'lucide-react';
 

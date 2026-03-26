@@ -86,3 +86,9 @@ export const editorSlice = createSlice({
       .addCase(saveScriptThunk.fulfilled, (state) => { state.loading = false; });
   }
 });
+
+// Export Actions để dùng trong Dispatch
+export const { addAction, updateData, removeAction, moveAction, setLinkMode, cancelLinking, finishLink, clearScript } = editorSlice.actions;
+
+// Export Reducer làm Default để Store nhận được
+export default editorSlice.reducer;
