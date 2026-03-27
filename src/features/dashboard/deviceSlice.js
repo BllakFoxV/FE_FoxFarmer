@@ -1,48 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apiClient from '@/api/apiClient';
-import { ENDPOINTS } from '@/api/endpoints'; // Đảm bảo import đúng đường dẫn ENDPOINTS của mày
+import { ENDPOINTS } from '@/api/endpoints';
+import { createApiThunk } from '@/utils/api';
 
 // --- ASYNC THUNKS ---
 
 // 1. Lấy danh sách thiết bị
-export const fetchDevicesThunk = createAsyncThunk(
+export const fetchDevicesThunk = createApiThunk(
   'device/fetchDevices',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.get(ENDPOINTS.DEVICES.LIST);
-      return response; 
-    } catch (err) {
-      return rejectWithValue(err.response?.data || "Lỗi lấy danh sách thiết bị");
-    }
-  }
+  async ()=> await apiClient.get(ENDPOINTS.DEVICES.LIST),
+  "error can't get device list"
 );
 
 // 2. Start Script trên Device
-export const startDeviceThunk = createAsyncThunk(
+export const startDeviceThunk = createApiThunk(
   'device/startDevice',
-  async ({ id, scriptName }, { rejectWithValue }) => {
-    try {
-      // Body truyền script_name xuống BE để nó biết chạy file nào
-      const response = await apiClient.post(ENDPOINTS.DEVICES.START(id), { script_name: scriptName });
-      return { id, data: response };
-    } catch (err) {
-      return rejectWithValue(err.response?.data || `Lỗi start thiết bị ${id}`);
-    }
-  }
-);
+  async (device_id, file_name)=> await apiClient.post(ENDPOINTS.DEVICES.START(id), { file_name }),
+  "device error"
+)
 
 // 3. Stop Script trên Device
-export const stopDeviceThunk = createAsyncThunk(
+export const stopDeviceThunk = createApiThunk(
   'device/stopDevice',
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.post(ENDPOINTS.DEVICES.STOP(id));
-      return { id, data: response };
-    } catch (err) {
-      return rejectWithValue(err.response?.data || `Lỗi stop thiết bị ${id}`);
-    }
-  }
-);
+  async (id) => await apiClient.post(ENDPOINTS.DEVICES.STOP(id)),
+  "error, can't stop"
+)
 
 // --- SLICE ---
 export const deviceSlice = createSlice({
