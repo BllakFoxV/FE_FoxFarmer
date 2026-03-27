@@ -7,12 +7,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: true, // 🟢 Mở LAN: Cho phép điện thoại truy cập qua IP máy tính
+    host: true,
     proxy: {
+      // Hễ thấy request nào bắt đầu bằng /api thì tống nó sang 3275
       '/api': {
         target: 'http://localhost:3275',
         changeOrigin: true,
-        secure: false,
+        secure: false, // Nếu BE không có HTTPS thì bật cái này
       }
     }
   },

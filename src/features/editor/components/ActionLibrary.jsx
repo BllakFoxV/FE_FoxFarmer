@@ -29,7 +29,11 @@ export const ActionLibrary = ({ isOpen, onClose }) => {
         {Object.entries(ACTION_MANIFEST)
           .filter(([key, val]) => val.label.toLowerCase().includes(query))
           .map(([key, config]) => (
-            <div key={key} onClick={() => { dispatch(editorSlice.actions.addAction(key)); onClose(); }}
+            <div key={key} onClick={() => { 
+                        dispatch(editorSlice.actions.addAction(key)); 
+                        setQuery("");
+                        onClose();
+                       }}
                  className="p-3 bg-transparent hover:bg-blue-600/10 hover:text-blue-400 cursor-pointer rounded-md text-gray-400 text-xs transition border border-transparent hover:border-blue-500/30">
               {config.label}
             </div>

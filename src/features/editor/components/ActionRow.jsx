@@ -4,6 +4,7 @@ import { FormRenderer } from './FormRenderer';
 import { GripVertical, Trash2, Copy } from 'lucide-react';
 
 export const ActionRow = ({ action, index, depth, onRemove, onOpenPicker }) => {
+  const actionType = String(action?.type || "");
   return (
     <Draggable draggableId={action.id} index={index}>
       {(provided, snapshot) => (
