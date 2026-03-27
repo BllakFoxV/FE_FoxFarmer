@@ -42,6 +42,9 @@ export const deviceSlice = createSlice({
       if (device) {
         device.status = status;
       }
+    },
+    setLoading: (state, action)=>{
+      state.loading = action.payload
     }
   },
   extraReducers: (builder) => {

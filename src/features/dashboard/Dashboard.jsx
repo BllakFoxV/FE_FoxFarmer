@@ -1,27 +1,16 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Monitor, Cpu, Play, Edit3 } from 'lucide-react';
+
+import { fetchDevicesThunk } from './deviceSlice';
 
 
 export const Dashboard = () => {
   const navigate = useNavigate();
-  const devices = [{ id: 'emulator-5554', name: 'Pixel 4 XL', status: 'online' }];
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleRefresh = async () => {
-    if (isRefreshing) return; // Chặn nếu đang chạy
-
-    setIsRefreshing(true);
-    try {
-      await deviceService.refreshDevices();
-      // Có thể thêm một cái toast thông báo thành công ở đây
-    } catch (err) {
-      console.error("Refresh failed", err);
-    } finally {
-      // Đợi 1s rồi mới cho click lại để tránh spam quá nhanh
-      setTimeout(() => setIsRefreshing(false), 1000);
-    }
-  };
+  const dispatch = useDispatch()
+  const devices = useSelector(state=> state.device.list)
+  const loading = useSelector((state) => state.device.loading);
 
   return (
     <div className="p-10 max-w-6xl mx-auto">
@@ -30,17 +19,17 @@ export const Dashboard = () => {
         <div className="flex gap-3">
           {/* NÚT REFRESH DEVICES */}
           <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
+            onClick={()=>{dispatch(fetchDevicesThunk())}}
+            disabled={loading}
             className={`group relative px-6 py-2 rounded-sm text-[11px] font-black uppercase tracking-widest transition-all duration-300 border
-      ${isRefreshing
+      ${loading
                 ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed'
                 : 'bg-black border-blue-900 text-blue-400 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(59,130,246,0.2)] active:scale-95'}`}
           >
             <span className="relative z-10">
-              {isRefreshing ? 'Scanning...' : 'Refresh Devices'}
+              {loading ? 'Scanning...' : 'Refresh Devices'}
             </span>
-            {!isRefreshing && (
+            {!loading && (
               <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             )}
           </button>
