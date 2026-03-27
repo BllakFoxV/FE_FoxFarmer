@@ -46,7 +46,7 @@ export const Dashboard = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {devices.map(d => (
-          <div key={d.id} className="bg-[#0d0d0d] border border-gray-800 rounded-2xl p-6 hover:border-blue-500 transition-all group">
+          <div key={d} className="bg-[#0d0d0d] border border-gray-800 rounded-2xl p-6 hover:border-blue-500 transition-all group">
             <div className="flex justify-between mb-8">
               <div className="p-4 bg-blue-600/10 rounded-xl text-blue-500"><Monitor size={32} /></div>
               <span className="text-[10px] bg-green-500/10 text-green-500 px-3 py-1 rounded-full font-bold h-fit">ACTIVE</span>

@@ -107,19 +107,19 @@ export const ACTION_MANIFEST = {
     [ActionType.OPEN_APP]: {
         label: "Launch App",
         fields: [
-            { key: 'package_name', type: 'text', label: 'Package ID' }
+            { key: 'package', type: 'text', label: 'Package ID' }
         ]
     },
     [ActionType.STOP_APP]: {
         label: "Force Stop App",
         fields: [
-            { key: 'package_name', type: 'text', label: 'Package ID' }
+            { key: 'package', type: 'text', label: 'Package ID' }
         ]
     },
     [ActionType.CHECK_ACTIVE_APP]: {
         label: "Check Current App",
         fields: [
-            { key: 'package_name', type: 'text', label: 'Expected Package' },
+            { key: 'package', type: 'text', label: 'Expected Package' },
             { key: 'var_name', type: 'text', label: 'Save Result (Boolean)' }
         ]
     },

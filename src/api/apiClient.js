@@ -16,8 +16,6 @@ const apiClient = axios.create({
 // Interceptor: Nơi xử lý Log hoặc gắn Token bảo mật tập trung
 apiClient.interceptors.response.use(
   (response) => {
-    // FE chỉ lấy đúng data từ BE, vứt hết mấy cái header, status code của Axios đi
-    console.log(response.data)
     return response.data;
   },
   (error) => {

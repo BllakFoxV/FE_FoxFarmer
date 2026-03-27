@@ -3,17 +3,18 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { toast } from 'react-hot-toast';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 import { ActionRow } from './ActionRow';
-import { reorderActions, updateData, setLinking } from '../editorSlice';
+import { reorderActions, updateData, setLinking, toggleGroup } from '../editorSlice';
 export const ActionList = ({ onOpenPicker }) => {
   const dispatch = useDispatch();
-  
-  // Connect directly to Redux Store
   const actions = useSelector(state => state.editor.actions);
+  const collapsedGroups = useSelector(state => state.editor.collapsedGroups);
   const linking = useSelector(state => state.editor.linking);
 
   let currentDepth = 0;
+  let hiddenUntilDepth = -1;
 
   const handleReorder = (result) => {
     if (!result.destination) return;
@@ -39,8 +40,22 @@ export const ActionList = ({ onOpenPicker }) => {
             <div className="max-w-3xl mx-auto space-y-4 pb-40">
               {actions.map((action, index) => {
                 const depth = currentDepth;
+                const isGroupStart = action.type === 'group_start';
+                const isGroupEnd = action.type === 'group_end';
+                
                 if (action.type === 'group_start') currentDepth++;
                 if (action.type === 'group_end') currentDepth--;
+                if (hiddenUntilDepth !== -1 && depth > hiddenUntilDepth) {
+                  if (isGroupEnd && depth === hiddenUntilDepth + 1) {
+                    hiddenUntilDepth = -1; // Hết group thì hiện lại
+                  }
+                  return null; // Không render các action con
+                }
+
+                const isCollapsed = collapsedGroups.includes(action.id);
+                if (isGroupStart && isCollapsed) {
+                  hiddenUntilDepth = depth; // Đánh dấu bắt đầu ẩn từ depth này
+                }
 
                 return (
                   <Draggable key={action.id} draggableId={String(action.id)} index={index} isDragDisabled={!!linking}>
@@ -56,6 +71,14 @@ export const ActionList = ({ onOpenPicker }) => {
                           ${linking ? "cursor-crosshair hover:ring-2 hover:ring-yellow-500" : ""}
                         `}
                       >
+                        {isGroupStart && (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); dispatch(toggleGroup(action.id)); }}
+                            className="absolute -left-8 top-5 z-30 text-gray-500 hover:text-blue-500 transition-colors"
+                          >
+                            {isCollapsed ? <ChevronRight size={20}/> : <ChevronDown size={20}/>}
+                          </button>
+                        )}
                         {linking && <div className="absolute inset-0 z-20" />}
                         <ActionRow
                           action={action}

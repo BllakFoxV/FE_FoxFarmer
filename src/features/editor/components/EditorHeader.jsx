@@ -5,17 +5,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, Save, Play, Smartphone, ChevronDown } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-import { loadScriptThunk, saveScriptThunk, clearScript, fetchScriptsThunk } from '../editorSlice';
+import { loadScriptThunk, saveScriptThunk, clearScript, fetchScriptsThunk, setCurrentName } from '../editorSlice';
 import { startDeviceThunk, deviceSlice } from '@/features/dashboard/deviceSlice';
 
 export const EditorHeader = () => {
-  const { scriptName } = useParams();
+  // const { scriptName } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Connect directly to Redux Store
   const linking = useSelector(state => state.editor.linking);
   const availableScripts = useSelector(state => state.editor.availableScripts);
+  const CurrentScript = useSelector(state => state.editor.currentScriptName);
   const actions = useSelector(state => state.editor.actions);
   const deviceList = useSelector(state => state.device.list);
   const targetDevice = useSelector(state => state.device.selected);
@@ -25,8 +26,11 @@ export const EditorHeader = () => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    setInputValue(!scriptName || scriptName === 'new' ? '' : scriptName);
-  }, [scriptName]);
+    if(CurrentScript){
+      loadScript(CurrentScript)
+      setInputValue(CurrentScript)
+    }
+  }, [CurrentScript]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -38,16 +42,21 @@ export const EditorHeader = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelect = async (name) => {
-    setShowDropdown(false);
-    setInputValue(name);
-    dispatch(clearScript());
+  const loadScript = async (name)=>{
     try {
       await dispatch(loadScriptThunk(name)).unwrap();
+      dispatch(setCurrentName(name))
       toast.success(`Loaded: ${name}`);
     } catch (err) {
       toast.error("Failed to load script!");
     }
+  }
+
+  const handleSelect = async (name) => {
+    setShowDropdown(false);
+    setInputValue(name);
+    dispatch(clearScript());
+    await loadScript(name)
   };
 
   const handleSave = async () => {

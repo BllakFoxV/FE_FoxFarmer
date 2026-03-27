@@ -1,10 +1,24 @@
 import React from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 import { FormRenderer } from './FormRenderer';
-import { GripVertical, Trash2, Copy } from 'lucide-react';
+import { GripVertical, Trash2, Copy , PlayCircle} from 'lucide-react';
+import { useSelector,useDispatch } from 'react-redux';
+import { testStepThunk, removeAction } from '../editorSlice';
 
-export const ActionRow = ({ action, index, depth, onRemove, onOpenPicker }) => {
+export const ActionRow = ({ action, index, depth, onOpenPicker }) => {
   const actionType = String(action?.type || "");
+  const dispatch = useDispatch();
+  const targetDevice = useSelector(state => state.device.selected);
+
+  const handleTestStep = (e) => {
+    e.stopPropagation(); // Không kích hoạt chọn mục tiêu khi đang ở chế độ Linking
+    if (!targetDevice) return toast.error("Chọn thiết bị trước khi test!");
+    
+    dispatch(testStepThunk({ 
+      deviceId: targetDevice, 
+      action: action 
+    }));
+  };
   return (
     <Draggable draggableId={action.id} index={index}>
       {(provided, snapshot) => (
@@ -30,8 +44,14 @@ export const ActionRow = ({ action, index, depth, onRemove, onOpenPicker }) => {
               </div>
               
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="text-gray-600 hover:text-blue-400 transition-colors"><Copy size={14}/></button>
-                <button onClick={onRemove} className="text-gray-600 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+                <button 
+                  onClick={handleTestStep}
+                  title="Test this step"
+                  className="text-green-500 hover:text-green-400 transition-colors p-1"
+                >
+                  <PlayCircle size={16}/>
+                </button>
+                <button onClick={()=>{dispatch(removeAction(action.id))}} className="text-gray-600 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
               </div>
             </div>
 

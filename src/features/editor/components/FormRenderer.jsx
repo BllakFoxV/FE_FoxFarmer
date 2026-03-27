@@ -1,15 +1,38 @@
-// FE_FoxFarmer/src/features/editor/components/FormRenderer.jsx
-import React from 'react';
+import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ACTION_MANIFEST } from '@/constants/actionManifest';
 import { Focus } from 'lucide-react'; // Import Icon Tâm ngắm
-import { editorSlice } from '../editorSlice';
+import { getActiveAppThunk, getListAppThunk, updateData, setLinking } from '../editorSlice'; // Thêm imports
+import { PackageSelectorModal } from './PackageSelectorModal';
+import { Smartphone, List , Target} from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 
 export const FormRenderer = ({ action, onOpenPicker }) => {
   const dispatch = useDispatch();
   const allActions = useSelector(state => state.editor.actions);
   const config = ACTION_MANIFEST[action.type];
+  const targetDevice = useSelector(state => state.device.selected);
+  const [appModal, setAppModal] = useState({ open: false, list: [] });
+
+  const handleGetActive = async (key) => {
+    if (!targetDevice) return toast.error("Chọn thiết bị trước!");
+    const res = await dispatch(getActiveAppThunk(targetDevice)).unwrap();
+    if (res) {
+      dispatch(updateData({ id: action.id, data: { [key]: res.package || "" } }));
+      toast.success(`Fetched: ${res}`);
+    }
+  };
+
+  const handleGetAll = async (key) => {
+    if (!targetDevice) return toast.error("Chọn thiết bị trước!");
+    const res = await dispatch(getListAppThunk(targetDevice)).unwrap();
+    if(!res){
+      toast("Can't Get List Package, Try Again Later")
+      return
+    }
+    setAppModal({ open: true, list: res, targetKey: key });
+  };
 
   const getDisplayIndex = (targetId) => {
     if (!targetId) return null;
@@ -18,7 +41,7 @@ export const FormRenderer = ({ action, onOpenPicker }) => {
   };
 
   const update = (key, val) => {
-    dispatch(editorSlice.actions.updateData({ id: action.id, data: { [key]: val } }));
+    dispatch(updateData({ id: action.id, data: { [key]: val } }));
   };
 
   if (!config) return <div className="text-red-500 text-[10px] font-bold">Action Type Not Supported</div>;
@@ -37,16 +60,7 @@ export const FormRenderer = ({ action, onOpenPicker }) => {
   return (
     <div className="flex flex-col mt-3 animate-in fade-in duration-300">
       
-      {/* NÚT PICK TỌA ĐỘ TO CHO ADB ACTIONS */}
-      {isTargetingAction && (
-        <button 
-          onClick={() => onOpenPicker(action.id)}
-          className="w-full mb-3 py-2 rounded text-[10px] font-black uppercase tracking-widest border border-blue-500 text-blue-400 bg-blue-900/10 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2"
-        >
-          <Focus size={14} /> 
-          {action.type === 'swipe' ? "Kéo thẻ Vẽ hướng vuốt" : "Click chọn Tọa độ"}
-        </button>
-      )}
+      
 
       {/* RENDER CÁC TRƯỜNG INPUT */}
       <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
@@ -60,7 +74,22 @@ export const FormRenderer = ({ action, onOpenPicker }) => {
               <label className="text-[9px] text-gray-500 uppercase font-black tracking-wider">
                 {field.label || field.key}
               </label>
-              
+              {field.key === 'package' && (
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleGetActive(field.key)}
+                      className="text-[8px] text-blue-500 hover:text-blue-400 font-bold uppercase flex items-center gap-1"
+                    >
+                      <Smartphone size={10}/> Active
+                    </button>
+                    <button 
+                      onClick={() => handleGetAll(field.key)}
+                      className="text-[8px] text-purple-500 hover:text-purple-400 font-bold uppercase flex items-center gap-1"
+                    >
+                      <List size={10}/> Get All
+                    </button>
+                  </div>
+                )}
               {(field.type === 'text' || field.type === 'number') && (
                 <input 
                   type={field.type}
@@ -105,7 +134,7 @@ export const FormRenderer = ({ action, onOpenPicker }) => {
 
               {field.type === 'link' && (
                 <button 
-                  onClick={() => dispatch(editorSlice.actions.setLinkMode({ id: action.id, field: field.key }))}
+                  onClick={() => dispatch(setLinking({ id: action.id, field: field.key }))}
                   className={`w-full py-1.5 px-2 rounded text-[10px] font-bold border transition-all truncate ${val ? 'bg-green-600/20 border-green-500 text-green-400' : 'bg-yellow-600/20 border-yellow-500 text-yellow-500 hover:scale-[1.02]'}`}
                 >
                   {val ? `-> Nhảy Bước ${getDisplayIndex(val)}` : "Chọn Bước Mục Tiêu"}
@@ -114,7 +143,26 @@ export const FormRenderer = ({ action, onOpenPicker }) => {
             </div>
           );
         })}
+        {isTargetingAction && (
+                    <button 
+                      onClick={() => onOpenPicker(action.id)}
+                      title="Chọn tọa độ từ màn hình"
+                      className="text-gray-600 hover:text-blue-500 transition-colors p-0.5"
+                    >
+                      <Target size={20}/> {/* Icon nhỏ xinh cạnh label */}
+                    </button>
+                  )}
       </div>
+      {appModal.open && appModal.list && (
+        <PackageSelectorModal 
+          packages={appModal.list}
+          onClose={() => setAppModal({ open: false, list: [] })}
+          onSelect={(pkg) => {
+            dispatch(updateData({ id: action.id, data: { [appModal.targetKey]: pkg } }));
+            setAppModal({ open: false, list: [] });
+          }}
+        />
+      )}
     </div>
   );
 };

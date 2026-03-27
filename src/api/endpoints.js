@@ -10,5 +10,7 @@ export const ENDPOINTS = {
     SCREENSHOT: (id) => `/device/${id}/screenshot`,
     START: (id) => `/device/${id}/start`,
     STOP: (id) => `/device/${id}/stop`,
+    ACTIVE_APP: (id) => `/device/${id}/active_app`,
+    LIST_APP: (id) => `/device/${id}/list_app`,
   }
 };

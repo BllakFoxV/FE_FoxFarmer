@@ -51,10 +51,10 @@ export const VisualPickerModal = ({ actionId, screenshot, onSave, onClose }) => 
     const cy = Math.round((currentPos?.y || startPos.y) * scaleY);
 
     if (mode === 'point') {
-      onSave({ x: sx, y: sy });
+      onSave({...action.data, x: sx, y: sy });
     } 
     else if (mode === 'swipe') {
-      onSave({ x1: sx, y1: sy, x2: cx, y2: cy });
+      onSave({...action.data, x1: sx, y1: sy, x2: cx, y2: cy });
     } 
     else {
       // Logic Crop Region cũ của mày
@@ -72,6 +72,7 @@ export const VisualPickerModal = ({ actionId, screenshot, onSave, onClose }) => 
       ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
       
       onSave({
+        ...action.data,
         region: { x1: x, y1: y, x2: x + w, y2: y + h },
         template: canvas.toDataURL('image/png')
       });

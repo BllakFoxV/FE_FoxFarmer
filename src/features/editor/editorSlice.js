@@ -36,12 +36,35 @@ export const getScreenshotThunk = createApiThunk(
   "Lỗi chụp màn hình"
 );
 
+export const testStepThunk = createApiThunk(
+  'editor/testStep',
+  ({ deviceId, action }) => {
+    console.log(action)
+    return apiClient.post(ENDPOINTS.SCRIPTS.TEST_STEP(deviceId), action)
+  },
+  "Lỗi thực thi thử bước này"
+);
+
+export const getActiveAppThunk = createApiThunk(
+  'editor/getActiveApp',
+  (deviceId) => apiClient.get(ENDPOINTS.DEVICES.ACTIVE_APP(deviceId)),
+  "Lỗi lấy app hiện hành"
+);
+
+export const getListAppThunk = createApiThunk(
+  'editor/getListApp',
+  (deviceId) => apiClient.get(ENDPOINTS.DEVICES.LIST_APP(deviceId)),
+  "Lỗi lấy danh sách app"
+);
+
 // --- SLICE ---
 export const editorSlice = createSlice({
   name: 'editor',
   initialState: {
+    currentScriptName: null,
     actions: [],
     availableScripts: [], 
+    collapsedGroups: [],
     loading: false,
     error: null,
     currentScreenshot: null,
@@ -78,7 +101,18 @@ export const editorSlice = createSlice({
     },
     setActions: (state, action) => {
       state.actions = action.payload;
-    }
+    },
+    setCurrentName:(state, action)=>{
+      state.currentScriptName = action.payload
+    },
+    toggleGroup: (state, action) => { 
+      const groupId = action.payload;
+      if (state.collapsedGroups.includes(groupId)) {
+        state.collapsedGroups = state.collapsedGroups.filter(id => id !== groupId);
+      } else {
+        state.collapsedGroups.push(groupId);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -113,7 +147,8 @@ export const editorSlice = createSlice({
 
 export const { 
   addAction, updateData, removeAction, reorderActions, 
-  setLinking, clearScript, setActions 
+  setLinking, clearScript, setActions, setCurrentName,
+  toggleGroup
 } = editorSlice.actions;
 
 export default editorSlice.reducer;

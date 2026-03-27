@@ -24,17 +24,6 @@ export const Editor = () => {
   const [isLibOpen, setIsLibOpen] = useState(false);
   const [picker, setPicker] = useState({ open: false, actionId: null, context: null });
 
-  // Init Data (Scripts & Devices)
-  useEffect(() => {
-    dispatch(fetchScriptsThunk());
-    dispatch(fetchDevicesThunk()).then((res) => {
-      // Auto-select first device
-      if (res.payload && res.payload.length > 0) {
-        dispatch(deviceSlice.actions.setSelectedDevice(res.payload[0].id));
-      }
-    });
-  }, [dispatch]);
-
   // Load target script
   useEffect(() => {
     const isNew = !scriptName || scriptName === 'new';
