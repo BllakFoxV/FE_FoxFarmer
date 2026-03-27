@@ -30,6 +30,7 @@ export const stopDeviceThunk = createApiThunk(
 export const deviceSlice = createSlice({
   name: 'device',
   initialState: {
+    selected: null,
     list: [], // Mảng chứa các object device { id, name, status... }
     loading: false,
     error: null,
@@ -45,6 +46,9 @@ export const deviceSlice = createSlice({
     },
     setLoading: (state, action)=>{
       state.loading = action.payload
+    },
+    setSelectedDevice: (state, action)=>{
+      state.selected = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -56,8 +60,8 @@ export const deviceSlice = createSlice({
       })
       .addCase(fetchDevicesThunk.fulfilled, (state, action) => {
         state.loading = false;
-        // Đảm bảo list luôn là mảng. Tùy interceptor của mày bóc data thế nào
-        state.list = Array.isArray(action.payload) ? action.payload : (action.payload?.data || []);
+        console.log(Array.isArray(action.payload))
+        state.list = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchDevicesThunk.rejected, (state, action) => {
         state.loading = false;
